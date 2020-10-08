@@ -1,4 +1,5 @@
 from django.db import models
+import json
 
 class Compound(models.Model):
     compound_id = models.IntegerField()
@@ -9,8 +10,19 @@ class Compound(models.Model):
     image = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.compound_id
 
+        dict = {'compound_id':self.compound_id,
+                'smiles':self.smiles,
+                'molecular_weight':self.molecular_weight,
+                'a_log_p':self.a_log_p,
+                'num_rings':self.num_rings,
+                'image':self.image
+                # 'assay_results':assay_results
+                }
+
+        return json.dumps(dict)
+
+    @classmethod
     def create(self, **kwargs):
         compound = self.objects.create(
             compound_id=kwargs['compound_id'],
@@ -30,13 +42,14 @@ class Compound(models.Model):
                 value=assay_result['value'],
                 unit=assay_result['unit']
             )
+        print('Added compound with related assays..')
         return compound
 
 
 class Assay(models.Model):
     # Create field to represent compound it comes from
     # on_delete=models.CASCADE means if compound is deleted so are its results
-    compound = models.ForeignKey(Compound, on_delete=models.CASCADE)
+    compound = models.ForeignKey(Compound, on_delete=models.CASCADE, related_name='assay_results')
     result_id = models.IntegerField()
     target =  models.CharField(max_length=50)
     result = models.CharField(max_length=10)

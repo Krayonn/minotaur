@@ -1,0 +1,10 @@
+<h1>CLICK HERE TO LOAD THE DATA IN YES</h1>
+<br>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" name="loadData" class="btn btn-primary btn-lg">Load data</button>
+</form>
+
+  <!-- {% for compound in compounds %} -->
+{{ compounds }}
+  <!-- {% endfor %} -->
