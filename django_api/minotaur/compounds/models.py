@@ -2,7 +2,8 @@ from django.db import models
 import json
 
 class Compound(models.Model):
-    compound_id = models.IntegerField()
+    # Make primary key
+    compound_id = models.IntegerField(primary_key=True)
     smiles = models.CharField(max_length=100)
     molecular_weight = models.FloatField()
     a_log_p = models.FloatField()
@@ -47,10 +48,11 @@ class Compound(models.Model):
 
 
 class Assay(models.Model):
-    # Create field to represent compound it comes from
+    # Create field to represent compound it comes from - foreignKey used for Many to on relationships
     # on_delete=models.CASCADE means if compound is deleted so are its results
     compound = models.ForeignKey(Compound, on_delete=models.CASCADE, related_name='assay_results')
-    result_id = models.IntegerField()
+    # Make primary key
+    result_id = models.IntegerField(primary_key=True)
     target =  models.CharField(max_length=50)
     result = models.CharField(max_length=10)
     operator = models.CharField(max_length=3)
