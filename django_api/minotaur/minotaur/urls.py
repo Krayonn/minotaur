@@ -22,6 +22,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('compounds/', include('compounds.urls')),
     path('', views.home, name='home'),
+    path('dashboard', views.dashboard, name='dashboard'),
+    path('dashboard/', include('django_plotly_dash.urls')),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

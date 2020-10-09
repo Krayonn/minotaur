@@ -1,3 +1,7 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+{% load static %}
+
 <h1>CLICK HERE TO LOAD THE DATA IN YES</h1>
 <br>
 <form method="post">
@@ -6,3 +10,5 @@
 </form>
 
 <pre><h5>{{ compounds }}</h5></pre>
+
+{% endblock %}

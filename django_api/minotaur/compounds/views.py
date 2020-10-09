@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from compounds.models import Compound
+from compounds.models import Assay
 from compounds.serializer import CompoundSerializer
 from compounds.serializer import AssaySerializer
 from django.http import Http404
@@ -46,11 +47,10 @@ class AssayDetail(APIView):
     def get(self, request, c_pk, a_pk, format=None):
         try:
             compound = Compound.objects.get(pk=c_pk)
-        except Compound.DoesNotExist:
-            raise Http404
-        try:
             assay = compound.assay_results.get(pk=a_pk)
         except Compound.DoesNotExist:
+            raise Http404
+        except Assay.DoesNotExist:
             raise Http404
         serializer = AssaySerializer(assay)
         return Response(serializer.data)
@@ -78,7 +78,7 @@ def load_data(request):
         #close the connection
         conn.close()
         print('HERE')
-        with open('compounds/fixtures/compounds_test.json') as data_file:
+        with open('compounds/fixtures/compounds.json') as data_file:
             json_data = json.loads(data_file.read())
 
             for compound_data in json_data:
