@@ -1,4 +1,5 @@
 import dash
+import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
@@ -13,21 +14,13 @@ def b64_image(image_filename):
         image = f.read()
     return f"data:{image_filename};base64," + base64.b64encode(image).decode('utf-8')
 
-def click_fn(trace, points, state):
-    print("CLICK")
-    ind = points.point_inds[0]
-    image_file = df['image'][ind]
-
-global image_file
-image_file = 'images/1117973.png'
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = DjangoDash('compounds_dashboard', external_stylesheets=external_stylesheets)
 
 df = pd.read_csv('compounds.csv')
-# df = pd.read_csv('https://plotly.github.io/datasets/country_indicators.csv')
 
-available_indicators = ['compound_id','molecular_weight', 'a_log_p', 'num_rings']
+available_indicators = ['compound_id','molecular_weight', 'a_log_p', 'num_rings', 'result']
 colour_indicators = ['num_rings', 'target']
 
 fig = go.FigureWidget()
@@ -65,29 +58,48 @@ app.layout = html.Div([
         ],style={'width': '30%', 'float': 'right', 'display': 'inline-block'})
     ]),
     dcc.Graph(style={'height': '600px'}, id='indicator-graphic'),
-    html.Img(id='molecule-image', src=b64_image('dashboard/static/dashboard/'+image_file)),
-    # html.Img(src=b64_image('dashboard/static/dashboard/+'images_file)),
+    html.Div([
+        html.Img(id='molecule-image', src=b64_image('dashboard/static/dashboard/images/1117973.png')),
+        # html.Div(df[['result_id', 'value']].iloc[0].to_frame().to_html(), id='molecule-details')
+        dash_table.DataTable(
+            id='molecule-details',
+            columns=[{"name": i, "id": i} for i in ['key', 'value']],
+            # data=[{'col1':i.key(), 'col2':i.value() for i in df[['compound_id', 'smiles', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings']].to_dict('rows')[0]
+            data=[{'key':k, 'value':v} for k,v in df[['compound_id', 'smiles', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings']].to_dict('rows')[0].items()]
+            )
+    ])
 ])
 
 @app.callback(
     [Output('indicator-graphic', 'figure'),
-    Output('molecule-image', 'src')],
+    Output('molecule-image', 'src'),
+    Output('molecule-details', 'data'),
+    ],
     [Input('xaxis-column', 'value'),
      Input('yaxis-column', 'value'),
      Input('colour-column', 'value'),
-     Input('indicator-graphic', 'clickData')])
+     Input('indicator-graphic', 'hoverData')
+     # Input('indicator-graphic', 'clickData')
+     ])
 def update_graph(xaxis_column_name, yaxis_column_name, colour_column_name, click_data
                  ):
-    print("HERE")
-    print(click_data)
+    # Update image of molecule
     if (click_data):
         point_ind = click_data['points'][0]['pointIndex']
-        print('Point ind: ',point_ind)
+        # print('Point ind: ',point_ind)
         image_file = df['image'][point_ind]
-        print('Image file: ',image_file)
+        # print('Image file: ',image_file)
         src=b64_image('dashboard/static/dashboard/'+image_file)
+
+        # Update details of molecule
+        data=[{'key':k, 'value':v} for k,v in df[['compound_id', 'smiles', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings']].to_dict('rows')[point_ind].items()]
+
     else:
         src=b64_image('dashboard/static/dashboard/images/27648.png')
+        data=[{'key':k, 'value':v} for k,v in df[['compound_id', 'smiles', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings']].to_dict('rows')[0].items()]
+
+
+    # Update graph based on column choices
     fig = px.scatter(df,xaxis_column_name, yaxis_column_name, color=colour_column_name, template='ggplot2')
     fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
 
@@ -95,4 +107,4 @@ def update_graph(xaxis_column_name, yaxis_column_name, colour_column_name, click
 
     fig.update_yaxes(title=yaxis_column_name)
 
-    return fig, src
+    return fig, src, data

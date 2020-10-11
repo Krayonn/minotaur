@@ -13,7 +13,6 @@ def dashboard(request):
     # converting data to normalised json so that assay results can be added to dataframe
     json_data = response.json()
     df = pd.json_normalize(json_data, record_path='assay_results', meta=['compound_id', 'smiles', 'molecular_weight' , 'a_log_p', 'molecular_formula', 'num_rings', 'image'], errors='ignore')
-    # df['image_data'] = df['image'].apply(lambda x: getImgData(x))
 
     df.to_csv('compounds.csv', index=False)
     from . import dashboard
