@@ -5,8 +5,20 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 from django_plotly_dash import DjangoDash
+import base64
+import plotly.graph_objects as go
 
+def b64_image(image_filename):
+    with open(image_filename, 'rb') as f:
+        image = f.read()
+    return f"data:{image_filename};base64," + base64.b64encode(image).decode('utf-8')
 
+def click_fn(trace, points, state):
+    print("CLICK")
+    ind = points.point_inds[0]
+    image_file = df['image'][ind]
+
+image_file = 'images/1117973.png'
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = DjangoDash('compounds_dashboard', external_stylesheets=external_stylesheets)
@@ -51,7 +63,8 @@ app.layout = html.Div([
         ],style={'width': '30%', 'float': 'right', 'display': 'inline-block'})
     ]),
     dcc.Graph(style={'height': '600px'}, id='indicator-graphic'),
-
+    html.Img(src=b64_image('dashboard/static/dashboard/images/1117973.png')),
+    # html.Img(src=b64_image('dashboard/static/dashboard/+'images_file)),
 ])
 
 @app.callback(
@@ -68,5 +81,5 @@ def update_graph(xaxis_column_name, yaxis_column_name, colour_column_name
     fig.update_xaxes(title=xaxis_column_name)
 
     fig.update_yaxes(title=yaxis_column_name)
-
+    fig.on_click(click_fn)
     return fig
