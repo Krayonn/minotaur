@@ -77,7 +77,6 @@ def load_data(request):
         conn.commit()
         #close the connection
         conn.close()
-        print('HERE')
         with open('compounds/fixtures/compounds.json') as data_file:
             json_data = json.loads(data_file.read())
 
@@ -88,9 +87,9 @@ def load_data(request):
     compound_serializer = CompoundSerializer(compounds, many=True)
     compounds_data = compound_serializer.data
     compounds_data_json = json.dumps(compounds_data, indent=4)
-    print(compounds_data_json)
+    # print(compounds_data_json)
 
     context = {'compounds':compounds_data_json}
     # context = {}
-    print(context)
+    # print(context)
     return render(request, 'compounds/loadData.html', context)

@@ -10,9 +10,14 @@ import base64
 import plotly.graph_objects as go
 
 def b64_image(image_filename):
+    # converts the data of the image file to base64 to be displayed on the web page
     with open(image_filename, 'rb') as f:
         image = f.read()
     return f"data:{image_filename};base64," + base64.b64encode(image).decode('utf-8')
+
+def getDataTable(df, ind):
+    # Gets a list of dictionaries in form {'key': header value, 'value': body value}
+    return [{'key':k, 'value':v} for k,v in df[['compound_id', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings']].to_dict('rows')[ind].items()]
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -59,14 +64,18 @@ app.layout = html.Div([
     ]),
     dcc.Graph(style={'height': '600px'}, id='indicator-graphic'),
     html.Div([
-        html.Img(id='molecule-image', src=b64_image('dashboard/static/dashboard/images/1117973.png')),
-        # html.Div(df[['result_id', 'value']].iloc[0].to_frame().to_html(), id='molecule-details')
-        dash_table.DataTable(
+        html.Img(
+        id='molecule-image',
+        src=b64_image('dashboard/static/dashboard/images/1117973.png'),
+        style={'display': 'inline-block'}
+        ),
+        html.Div([
+            dash_table.DataTable(
             id='molecule-details',
             columns=[{"name": i, "id": i} for i in ['key', 'value']],
-            # data=[{'col1':i.key(), 'col2':i.value() for i in df[['compound_id', 'smiles', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings']].to_dict('rows')[0]
-            data=[{'key':k, 'value':v} for k,v in df[['compound_id', 'smiles', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings']].to_dict('rows')[0].items()]
+            data = getDataTable(df, 0)
             )
+        ],style={'width': '50%', 'float': 'right', 'margin-right': '10%', 'display': 'inline-block'})
     ])
 ])
 
@@ -81,22 +90,21 @@ app.layout = html.Div([
      Input('indicator-graphic', 'hoverData')
      # Input('indicator-graphic', 'clickData')
      ])
-def update_graph(xaxis_column_name, yaxis_column_name, colour_column_name, click_data
+def update_graph(xaxis_column_name, yaxis_column_name, colour_column_name, point_data
                  ):
     # Update image of molecule
-    if (click_data):
-        point_ind = click_data['points'][0]['pointIndex']
+    if (point_data):
+        point_ind = point_data['points'][0]['pointIndex']
         # print('Point ind: ',point_ind)
         image_file = df['image'][point_ind]
         # print('Image file: ',image_file)
         src=b64_image('dashboard/static/dashboard/'+image_file)
 
         # Update details of molecule
-        data=[{'key':k, 'value':v} for k,v in df[['compound_id', 'smiles', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings']].to_dict('rows')[point_ind].items()]
-
+        data = getDataTable(df, point_ind)
     else:
         src=b64_image('dashboard/static/dashboard/images/27648.png')
-        data=[{'key':k, 'value':v} for k,v in df[['compound_id', 'smiles', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings']].to_dict('rows')[0].items()]
+        data = getDataTable(df, 0)
 
 
     # Update graph based on column choices

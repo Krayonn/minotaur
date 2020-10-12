@@ -10,5 +10,5 @@ class CompoundSerializer(serializers.ModelSerializer):
     assay_results = AssaySerializer(many=True)
     class Meta:
         model = Compound
-        fields = ['compound_id','smiles', 'molecular_weight', 'a_log_p', 'num_rings', 'image', 'assay_results']
+        fields = ['compound_id','smiles', 'molecular_weight', 'a_log_p', 'molecular_formula', 'num_rings', 'image', 'assay_results']
         # fields = '__all__' # returns all fields

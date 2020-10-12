@@ -7,15 +7,16 @@ class Compound(models.Model):
     smiles = models.CharField(max_length=100)
     molecular_weight = models.FloatField()
     a_log_p = models.FloatField()
+    molecular_formula = models.CharField(max_length=50)
     num_rings = models.IntegerField()
     image = models.CharField(max_length=50)
 
     def __str__(self):
-
         dict = {'compound_id':self.compound_id,
                 'smiles':self.smiles,
                 'molecular_weight':self.molecular_weight,
                 'a_log_p':self.a_log_p,
+                'molecular_formula':self.molecular_formula,
                 'num_rings':self.num_rings,
                 'image':self.image
                 # 'assay_results':assay_results
@@ -30,6 +31,7 @@ class Compound(models.Model):
             smiles=kwargs['smiles'],
             molecular_weight=kwargs['molecular_weight'],
             a_log_p=kwargs['ALogP'],
+            molecular_formula=kwargs['molecular_formula'],
             num_rings=kwargs['num_rings'],
             image=kwargs['image']
         )

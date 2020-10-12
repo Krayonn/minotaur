@@ -5,8 +5,6 @@ import pandas as pd
 def home(request):
     return render(request, 'dashboard/home.html')
 
-
-
 def dashboard(request):
     # calling it's own api to avoid repeating of code
     response = requests.get('http://localhost:8000/compounds/')
