@@ -33,6 +33,13 @@ df['a_log_p'] = df['a_log_p'].apply(lambda x: round(x,3))
 available_indicators = ['compound_id','molecular_weight', 'a_log_p', 'num_rings']
 colour_indicators = ['num_rings', 'target']
 assay_indicators = ['Kd', 'IC50']
+assay_columns = ['result_id', 'target', 'result', 'operator', 'value', 'unit']
+
+dummy_data = df[df['compound_id'] == 1117973][assay_columns].to_dict('rows')
+print('HERE', dummy_data)
+dum_data2 = getDataTable(df, 1117973)
+print('HERE', dum_data2)
+
 
 fig = go.FigureWidget()
 
@@ -49,8 +56,7 @@ app.layout = html.Div([
                 type="default",
                 children=html.Div(id="loading-output-1")
             ),
-        ],
-        style={'width': '30%', 'float': 'left', 'display': 'inline-block'}),
+        ], style={'width': '30%', 'float': 'left', 'display': 'inline-block'}),
 
         html.Div([
             dcc.Dropdown(
@@ -68,50 +74,46 @@ app.layout = html.Div([
             ),
         ],style={'width': '30%', 'float': 'right', 'display': 'inline-block'})
     ]),
+
     html.Div([
-        dcc.Input(
-            id='compound_id',
-            type='number',
-            placeholder='Input compound ID'
-        )
-    ]),
-    dcc.Graph(style={'height': '600px'}, id='compounds-graph'),
+        dcc.Graph(id='compounds-graph', style={'height': '700px'})
+    ], style={'width': '59%', 'display': 'inline-block'}),
+
     html.Div([
-        html.Img(
-        id='molecule-image',
-        src=b64_image('dashboard/static/dashboard/images/1117973.png'),
-        style={'display': 'inline-block'}
-        ),
         html.Div([
             dash_table.DataTable(
-            id='molecule-details',
-            columns=[{"name": i, "id": i} for i in ['key', 'value']],
-            data = getDataTable(df, 1117973)
-            )
-        ],style={'width': '49%', 'float': 'right', 'margin-right': '10%', 'display': 'inline-block'})
-    ]),
+                id='molecule-details',
+                columns=[{"name": i, "id": i} for i in ['key', 'value']],
+                data=getDataTable(df, 1117973))
+        ]),
+        html.Div([
+            html.Img(
+                id='molecule-image',
+                src=b64_image('dashboard/static/dashboard/images/1117973.png')
+                )
+        ])
+    ], style={'postion':'absolute','width': '39%', 'display': 'inline-block'}),
     html.Div([
-        dcc.Dropdown(
-            id='yaxis-assay-column',
-            options=[{'label': i, 'value': i} for i in assay_indicators],
-            placeholder="Select y-axis"
-        ),
-        dcc.Graph(style={'height': '600px'}, id='assays-graph')
-    ])
+        dash_table.DataTable(
+            id='assay-results',
+            columns=[{"name": i, "id": i} for i in assay_columns],
+            data=dummy_data)
+    ], style={'margin': 'auto'}),
 ])
+
+
 
 @app.callback(
     [Output('compounds-graph', 'figure'),
     Output('molecule-image', 'src'),
-    Output('molecule-details', 'data')    ],
-    [Input('compound_id', 'value'),
-     Input('xaxis-column', 'value'),
+    Output('molecule-details', 'data')],
+    [Input('xaxis-column', 'value'),
      Input('yaxis-column', 'value'),
      Input('colour-column', 'value'),
      Input('compounds-graph', 'hoverData')
      # Input('compounds-graph', 'clickData')
      ])
-def update_graph(compound_id, xaxis_column_name, yaxis_column_name, colour_column_name, point_data
+def update_graph(xaxis_column_name, yaxis_column_name, colour_column_name, point_data
                  ):
 
     # cast to str otherwise it is a shallow copy
@@ -138,8 +140,8 @@ def update_graph(compound_id, xaxis_column_name, yaxis_column_name, colour_colum
         data = getDataTable(df, 1117973)
 
     # If compound id given filter df based of that
-    df_fin = df[df['compound_id']==compound_id] if (compound_id) else df
-
+    # df_fin = df[df['compound_id']==compound_id] if (compound_id) else df
+    df_fin = df
     if xaxis_column_name in ['Kd', 'IC50']:
         # Filter df to only include assays results for selected type (Kd or IC50)
         # df_fin = df_fin[df_fin['result']==xaxis_column_name]
@@ -158,7 +160,7 @@ def update_graph(compound_id, xaxis_column_name, yaxis_column_name, colour_colum
     fig = px.scatter(df_fin,xaxis_column_name, yaxis_column_name, color=colour_column_name, template='ggplot2')
 
     # ui revsion helps keep the state of fig (zooming, panning etc) the same unless one of the given components are changed when fig is updated
-    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest', uirevision=f'{compound_id}{xaxis_column_name}{yaxis_column_name}{colour_column_name}')
+    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest', uirevision=f'{xaxis_column_name}{yaxis_column_name}{colour_column_name}')
 
     # This returns componund id when point is hovered over
     fig.update_traces(customdata=df['compound_id'])
@@ -169,23 +171,15 @@ def update_graph(compound_id, xaxis_column_name, yaxis_column_name, colour_colum
     return fig, src, data
 
 @app.callback(
-    Output('assays-graph', 'figure'),
-    [Input('yaxis-assay-column', 'value'),
-     Input('compounds-graph', 'hoverData')
+    Output('assay-results', 'data'),
+    [Input('compounds-graph', 'hoverData')]
      # Input('compounds-graph', 'clickData')
-     ])
-def update_graph(yaxis_assay_col_name, point_data
-                 ):
-    print('HERE min grpahy')
+     )
+def update_table(point_data):
     point_compound_id = point_data['points'][0]['customdata']
 
-    print('HERE', point_compound_id)
     df_a = df[df['compound_id'] == point_compound_id]
-    df_a = df_a[df_a['result'] == yaxis_assay_col_name]
-    # print('HERE', df_a)
-    fig = px.scatter(df_a,'target', 'value', color='target', template='ggplot2')
-    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest', uirevision=yaxis_assay_col_name, showlegend=False)
-    yaxis_assay_col_label = yaxis_assay_col_name + '/' +'nM'
-    fig.update_xaxes(title='Target')
-    fig.update_yaxes(title=yaxis_assay_col_label)
-    return fig
+    tdata = df_a[assay_columns].to_dict('rows')
+    print('HERE', tdata)
+
+    return tdata
