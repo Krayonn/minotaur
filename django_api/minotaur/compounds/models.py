@@ -1,12 +1,13 @@
 from django.db import models
 import json
+import decimal
 
 class Compound(models.Model):
     # Make primary key
     compound_id = models.IntegerField(primary_key=True)
     smiles = models.CharField(max_length=100)
-    molecular_weight = models.FloatField()
-    a_log_p = models.FloatField()
+    molecular_weight = models.DecimalField(max_digits=10, decimal_places=5)
+    a_log_p = models.DecimalField(max_digits=10, decimal_places=3)
     molecular_formula = models.CharField(max_length=50)
     num_rings = models.IntegerField()
     image = models.CharField(max_length=50)
@@ -29,8 +30,8 @@ class Compound(models.Model):
         compound = self.objects.create(
             compound_id=kwargs['compound_id'],
             smiles=kwargs['smiles'],
-            molecular_weight=kwargs['molecular_weight'],
-            a_log_p=kwargs['ALogP'],
+            molecular_weight=decimal.Decimal(kwargs['molecular_weight']),
+            a_log_p=decimal.Decimal(kwargs['ALogP']),
             molecular_formula=kwargs['molecular_formula'],
             num_rings=kwargs['num_rings'],
             image=kwargs['image']
