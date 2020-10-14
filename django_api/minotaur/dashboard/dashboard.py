@@ -49,7 +49,8 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='xaxis-column',
                 options=[{'label': i, 'value': i} for i in available_indicators],
-                placeholder="Select x-axis"
+                # placeholder="Select x-axis"
+                value='molecular_weight'
             ),
             dcc.Loading(
                 id="loading-1",
@@ -62,17 +63,10 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='yaxis-column',
                 options=[{'label': i, 'value': i} for i in available_indicators],
-                placeholder="Select y-axis"
+                value='a_log_p'
+                # placeholder="Select y-axis"
             ),
-        ],style={'width': '30%', 'margin-left': '5%', 'display': 'inline-block'}),
-
-        html.Div([
-            dcc.Dropdown(
-                id='colour-column',
-                options=[{'label': i, 'value': i} for i in colour_indicators],
-                placeholder="Select colour"
-            ),
-        ],style={'width': '30%', 'float': 'right', 'display': 'inline-block'})
+        ],style={'width': '30%', 'margin-left': '5%', 'display': 'inline-block'})
     ]),
 
     html.Div([
@@ -84,21 +78,32 @@ app.layout = html.Div([
             dash_table.DataTable(
                 id='molecule-details',
                 columns=[{"name": i, "id": i} for i in ['key', 'value']],
+                style_cell={'textAlign': 'left', 'padding': '5px'},
+                style_header={
+                    'backgroundColor': 'white',
+                    'fontWeight': 'bold'
+                },
                 data=getDataTable(df, 1117973))
-        ]),
+        ],  style={'top': '-100px'}),
         html.Div([
             html.Img(
                 id='molecule-image',
                 src=b64_image('dashboard/static/dashboard/images/1117973.png')
                 )
         ])
-    ], style={'postion':'absolute','width': '39%', 'display': 'inline-block'}),
+    ], style={'margin-top': '-200px', 'width': '39%', 'display': 'inline-block'}),
     html.Div([
         dash_table.DataTable(
             id='assay-results',
             columns=[{"name": i, "id": i} for i in assay_columns],
+            style_cell={'textAlign': 'left', 'padding': '5px'},
+            style_as_list_view=True,
+            style_header={
+                'backgroundColor': 'white',
+                'fontWeight': 'bold'
+            },
             data=dummy_data)
-    ], style={'margin': 'auto'}),
+    ], style={'margin-left': '10%', 'margin-right': '10%'}),
 ])
 
 
@@ -109,18 +114,17 @@ app.layout = html.Div([
     Output('molecule-details', 'data')],
     [Input('xaxis-column', 'value'),
      Input('yaxis-column', 'value'),
-     Input('colour-column', 'value'),
      Input('compounds-graph', 'hoverData')
      # Input('compounds-graph', 'clickData')
      ])
-def update_graph(xaxis_column_name, yaxis_column_name, colour_column_name, point_data
+def update_graph(xaxis_column_name, yaxis_column_name, point_data
                  ):
 
     # cast to str otherwise it is a shallow copy
     xaxis_column_label = str(xaxis_column_name)
     yaxis_column_label = str(yaxis_column_name)
 
-    print('HERE',point_data)
+    print('HERE2',point_data)
     # Update image of molecule
     if (point_data):
         point_ind = point_data['points'][0]['pointIndex']
@@ -142,25 +146,12 @@ def update_graph(xaxis_column_name, yaxis_column_name, colour_column_name, point
     # If compound id given filter df based of that
     # df_fin = df[df['compound_id']==compound_id] if (compound_id) else df
     df_fin = df
-    if xaxis_column_name in ['Kd', 'IC50']:
-        # Filter df to only include assays results for selected type (Kd or IC50)
-        # df_fin = df_fin[df_fin['result']==xaxis_column_name]
-        # Set the axis lable to kd or IC50 and add corresponding units
-        xaxis_column_label = xaxis_column_name + ' / ' + df_fin['unit'].unique()[0]
-        xaxis_column_name = 'value'
-
-    if yaxis_column_name in ['Kd', 'IC50']:
-        # Filter df to only include assays results for selected type (Kd or IC50)
-        # df_fin = df_fin[df_fin['result']==yaxis_column_name]
-        # Set the axis lable to kd or IC50 and add corresponding units
-        yaxis_column_label = yaxis_column_name + ' / ' + df_fin['unit'].unique()[0]
-        yaxis_column_name = 'value'
 
     # Update graph based on column choices
-    fig = px.scatter(df_fin,xaxis_column_name, yaxis_column_name, color=colour_column_name, template='ggplot2')
+    fig = px.scatter(df_fin,xaxis_column_name, yaxis_column_name, color='num_rings', template='ggplot2')
 
     # ui revsion helps keep the state of fig (zooming, panning etc) the same unless one of the given components are changed when fig is updated
-    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest', uirevision=f'{xaxis_column_name}{yaxis_column_name}{colour_column_name}')
+    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest', uirevision=f'{xaxis_column_name}{yaxis_column_name}')
 
     # This returns componund id when point is hovered over
     fig.update_traces(customdata=df['compound_id'])
@@ -176,6 +167,7 @@ def update_graph(xaxis_column_name, yaxis_column_name, colour_column_name, point
      # Input('compounds-graph', 'clickData')
      )
 def update_table(point_data):
+    print('HERE', point_data)
     point_compound_id = point_data['points'][0]['customdata']
 
     df_a = df[df['compound_id'] == point_compound_id]
