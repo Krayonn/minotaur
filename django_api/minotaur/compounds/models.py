@@ -20,7 +20,6 @@ class Compound(models.Model):
                 'molecular_formula':self.molecular_formula,
                 'num_rings':self.num_rings,
                 'image':self.image
-                # 'assay_results':assay_results
                 }
 
         return json.dumps(dict)
@@ -28,7 +27,7 @@ class Compound(models.Model):
     @classmethod
     def create(self, **kwargs):
         compound = self.objects.create(
-            compound_id=kwargs['compound_id'],
+            compound=kwargs['compound'],
             smiles=kwargs['smiles'],
             molecular_weight=decimal.Decimal(kwargs['molecular_weight']),
             a_log_p=decimal.Decimal(kwargs['ALogP']),
@@ -38,7 +37,7 @@ class Compound(models.Model):
         )
         for assay_result in kwargs['assay_results']:
             assay, created = Assay.objects.get_or_create(
-                compound=compound,
+                compound_id=compound_id,
                 result_id=assay_result['result_id'],
                 target=assay_result['target'],
                 result=assay_result['result'],

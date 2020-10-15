@@ -35,11 +35,8 @@ colour_indicators = ['num_rings', 'target']
 assay_indicators = ['Kd', 'IC50']
 assay_columns = ['result_id', 'target', 'result', 'operator', 'value', 'unit']
 
+# data to populate compund table initially
 dummy_data = df[df['compound_id'] == 1117973][assay_columns].to_dict('rows')
-print('HERE', dummy_data)
-dum_data2 = getDataTable(df, 1117973)
-print('HERE', dum_data2)
-
 
 fig = go.FigureWidget()
 
@@ -78,20 +75,24 @@ app.layout = html.Div([
             dash_table.DataTable(
                 id='molecule-details',
                 columns=[{"name": i, "id": i} for i in ['key', 'value']],
-                style_cell={'textAlign': 'left', 'padding': '5px'},
+                style_cell={'textAlign': 'left',
+                            'padding': '5px',
+                            'minWidth': '50%',
+                            'width': '50%',
+                            'maxWidth': '50%'},
                 style_header={
                     'backgroundColor': 'white',
                     'fontWeight': 'bold'
                 },
                 data=getDataTable(df, 1117973))
-        ],  style={'top': '-100px'}),
+        ], style={'table-layout': 'fixed'}),
         html.Div([
             html.Img(
                 id='molecule-image',
                 src=b64_image('dashboard/static/dashboard/images/1117973.png')
                 )
-        ])
-    ], style={'margin-top': '-200px', 'width': '39%', 'display': 'inline-block'}),
+        ], style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': 'auto', 'width':'40%', 'height': '40%'})
+    ], style={'margin': 'auto', 'width': '39%', 'display': 'inline-block'}),
     html.Div([
         dash_table.DataTable(
             id='assay-results',
@@ -105,8 +106,6 @@ app.layout = html.Div([
             data=dummy_data)
     ], style={'margin-left': '10%', 'margin-right': '10%'}),
 ])
-
-
 
 @app.callback(
     [Output('compounds-graph', 'figure'),
@@ -124,27 +123,18 @@ def update_graph(xaxis_column_name, yaxis_column_name, point_data
     xaxis_column_label = str(xaxis_column_name)
     yaxis_column_label = str(yaxis_column_name)
 
-    print('HERE2',point_data)
     # Update image of molecule
     if (point_data):
         point_ind = point_data['points'][0]['pointIndex']
         point_compound_id = df['compound_id'][point_ind]
-        print('HERE', point_compound_id)
-        # print('Point ind: ',point_ind)
-        # image_file = df['image'][point_ind]
         image_file = df[df['compound_id'] == point_compound_id]['image'].unique()[0]
-        # print('Image file: ',image_file)
-        src=b64_image('dashboard/static/dashboard/'+image_file)
-
         # Update details of molecule
         data = getDataTable(df, point_compound_id)
-
     else:
         src=b64_image('dashboard/static/dashboard/images/27648.png')
         data = getDataTable(df, 1117973)
 
     # If compound id given filter df based of that
-    # df_fin = df[df['compound_id']==compound_id] if (compound_id) else df
     df_fin = df
 
     # Update graph based on column choices
@@ -155,7 +145,6 @@ def update_graph(xaxis_column_name, yaxis_column_name, point_data
 
     # This returns componund id when point is hovered over
     fig.update_traces(customdata=df['compound_id'])
-
     fig.update_xaxes(title=xaxis_column_label)
     fig.update_yaxes(title=yaxis_column_label)
 
@@ -167,11 +156,9 @@ def update_graph(xaxis_column_name, yaxis_column_name, point_data
      # Input('compounds-graph', 'clickData')
      )
 def update_table(point_data):
-    print('HERE', point_data)
     point_compound_id = point_data['points'][0]['customdata']
 
     df_a = df[df['compound_id'] == point_compound_id]
     tdata = df_a[assay_columns].to_dict('rows')
-    print('HERE', tdata)
 
     return tdata

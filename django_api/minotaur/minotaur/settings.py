@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'compounds',
     'dashboard',
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
