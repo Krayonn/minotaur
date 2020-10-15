@@ -2,11 +2,14 @@
 {% block content %}
 
 {% load static %}
-<h1>Minotaur</h1>
-<h3>A webapp to retrieve and view compound data and their related assays results</h3>
 
-<h2><a href="{% url 'dashboard' %}">Click here for the dasboard</a></h2>
+<div class="container">
+  <h1>Minotaur</h1>
+  <h3>A webapp to retrieve and view compound data and their related assays results</h3>
 
-<h2><a href="{% url 'dashboard' %}">Click here for the dasboard</a></h2>
+  <h2><a href="{% url 'dashboard' %}">Click here for the dasboard</a></h2>
+
+<h2><a href="{% url 'compounds:load_data' %}">Click here for the Api</a></h2>
+</div>
 
 {% endblock %}
