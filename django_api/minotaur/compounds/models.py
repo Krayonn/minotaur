@@ -27,7 +27,7 @@ class Compound(models.Model):
     @classmethod
     def create(self, **kwargs):
         compound = self.objects.create(
-            compound=kwargs['compound'],
+            compound_id=kwargs['compound_id'],
             smiles=kwargs['smiles'],
             molecular_weight=decimal.Decimal(kwargs['molecular_weight']),
             a_log_p=decimal.Decimal(kwargs['ALogP']),
@@ -37,7 +37,7 @@ class Compound(models.Model):
         )
         for assay_result in kwargs['assay_results']:
             assay, created = Assay.objects.get_or_create(
-                compound_id=compound_id,
+                compound=compound,
                 result_id=assay_result['result_id'],
                 target=assay_result['target'],
                 result=assay_result['result'],

@@ -9,15 +9,16 @@
     {% csrf_token %}
     <button type="submit" name="loadData" class="btn btn-primary btn-lg">Load data</button>
   </form>
-  <br><br>
-  <h3>{{ data_loaded }}</h3>
-
+  <br>
+  <h4>{{ data_loaded }}</h4>
+<br>
+<br>
   <h3>To use the Api itself, use the following paths</h3>
   <ul>
   <li><em>/compounds</em> - to retrieve a list of all the compounds in the database.</li>
   <li><em>/compounds/1234</em> - to retrieve the compound with the given compound ID.</li>
   <li><em>/compounds/123/assays</em> - to retrieve only the list of assay results of the compound with the given compound id.</li>
-  <li><em>/compounds/123/assays/456</em> - to retrieve the assay result with the given assay result idea.</li>
+  <li><em>/compounds/123/assays/456</em> - to retrieve the assay result with the given assay result ID.</li>
   </ul>
   <h4>You can also do filtering with query parameters</h4>
   <h5>Compound filters for</h5>
@@ -29,6 +30,9 @@
     <li>target</li>
     <li>result (Kd or IC50)</li>
   </ul>
+
+  <p>e.g. http://localhost:8000/compounds/1117973/assays?target=Bromodomain-containing%20protein%204&result=IC50
+  will return assays for compound 1117973 with target 'Bromodomain-containing protein 4' and result type of IC50</p>
 </div>
 
 

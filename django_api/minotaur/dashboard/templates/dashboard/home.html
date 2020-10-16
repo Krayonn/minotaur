@@ -5,11 +5,24 @@
 
 <div class="container">
   <h1>Minotaur</h1>
-  <h3>A webapp to retrieve and view compound data and their related assays results</h3>
+  <h4>A webapp to retrieve and view compound data and their related assays results</h4>
+  <br>
+  <br>
+  <div class="row justify-content-center my-3">
+    <div class="col-5">
+      <h3><a href="{% url 'dashboard' %}">Click here for the dasboard</a></h3>
+      <a href="{% url 'dashboard' %}">
+        <img src="{% static 'dashboard/zero_state_squirrel.svg' %}" class="img-fluid" href="{% url 'dashboard' %}">
+      </a>
+    </div>
+    <div class="col-5">
+      <h3><a href="{% url 'compound:load_data' %}">Click here for the Api</a></h3>
+      <a href="{% url 'compound:load_data' %}">
+        <img src="{% static 'dashboard/zero_state_nut.svg' %}" class="img-fluid" href="{% url 'dashboard' %}">
+      </a>
+    </div>
+  </div>
 
-  <h2><a href="{% url 'dashboard' %}">Click here for the dasboard</a></h2>
-
-<h2><a href="{% url 'compounds:load_data' %}">Click here for the Api</a></h2>
 </div>
 
 {% endblock %}

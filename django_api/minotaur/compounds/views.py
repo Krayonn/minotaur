@@ -99,10 +99,11 @@ def load_data(request):
                 compound = Compound.create(**compound_data)
 
         context = {'data_loaded':'Data has been loaded in successfully'}
-    compounds = list(Compound.objects.all())
-    compound_serializer = CompoundSerializer(compounds, many=True)
-    compounds_data = compound_serializer.data
-    compounds_data_json = json.dumps(compounds_data, indent=4)
+    # to print out all the data
+    # compounds = list(Compound.objects.all())
+    # compound_serializer = CompoundSerializer(compounds, many=True)
+    # compounds_data = compound_serializer.data
+    # compounds_data_json = json.dumps(compounds_data, indent=4)
     # print(compounds_data_json)
 
     return render(request, 'compounds/loadData.html', context)

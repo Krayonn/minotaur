@@ -46,7 +46,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='xaxis-column',
                 options=[{'label': i, 'value': i} for i in available_indicators],
-                # placeholder="Select x-axis"
+                placeholder="Select x-axis",
                 value='molecular_weight'
             ),
             dcc.Loading(
@@ -60,17 +60,18 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='yaxis-column',
                 options=[{'label': i, 'value': i} for i in available_indicators],
+                placeholder="Select y-axis",
                 value='a_log_p'
-                # placeholder="Select y-axis"
             ),
         ],style={'width': '30%', 'margin-left': '5%', 'display': 'inline-block'})
     ]),
 
     html.Div([
-        dcc.Graph(id='compounds-graph', style={'height': '700px'})
+        dcc.Graph(id='compounds-graph', style={'height': '600px'})
     ], style={'width': '59%', 'display': 'inline-block'}),
 
     html.Div([
+        html.H3('Compound details'),
         html.Div([
             dash_table.DataTable(
                 id='molecule-details',
@@ -94,6 +95,7 @@ app.layout = html.Div([
         ], style={'display': 'block', 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': 'auto', 'width':'40%', 'height': '40%'})
     ], style={'margin': 'auto', 'width': '39%', 'display': 'inline-block'}),
     html.Div([
+        html.H3('Assay results for selected compound'),
         dash_table.DataTable(
             id='assay-results',
             columns=[{"name": i, "id": i} for i in assay_columns],
@@ -128,6 +130,7 @@ def update_graph(xaxis_column_name, yaxis_column_name, point_data
         point_ind = point_data['points'][0]['pointIndex']
         point_compound_id = df['compound_id'][point_ind]
         image_file = df[df['compound_id'] == point_compound_id]['image'].unique()[0]
+        src=b64_image('dashboard/static/dashboard/'+image_file)
         # Update details of molecule
         data = getDataTable(df, point_compound_id)
     else:
