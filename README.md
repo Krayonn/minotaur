@@ -5,14 +5,17 @@ A webapp containing an API to retrieve compound and related assay result data, a
 To setup the project up you will need to have python 3 installed on your machine, and it is encouraged to use virtual environments.
 
 To install the requirements for this project, use
+
 `pip install -r requirements.txt`
 
 Then to set up the database run, navigate to `minotaur\django_api\minotaur` and run
+
 `python manage.py makemigrations compounds`
 
 `python manage.py migrate`
 
 To start the webapp on your localhost, please navigate to the django_api, then use
+
 `python manage.py runserver`
 
 In your browser then go to [http://localhost:8000/](http://localhost:8000/) to view the webapp.
