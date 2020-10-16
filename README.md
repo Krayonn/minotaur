@@ -17,9 +17,10 @@ To start the webapp on your localhost, please navigate to the django_api, then u
 
 In your browser then go to [http://localhost:8000/](http://localhost:8000/) to view the webapp.
 
-Please then click on the acorn for the api page, and then use the `load data` button to load in the data to the database
+Please then click on the acorn for the api page, and then use the `load data` button to load in the data to the database.
 
 After you can use the api and dashboard
+
 ## Pages
 ### Home page
 Here you find some basic information on the project, as well as links to the other pages.
