@@ -14,7 +14,7 @@ Then to set up the database run, navigate to `minotaur\django_api\minotaur` and 
 
 `python manage.py migrate`
 
-To start the webapp on your localhost, please navigate to the django_api, then use
+To start the webapp on your localhost, please run
 
 `python manage.py runserver`
 
